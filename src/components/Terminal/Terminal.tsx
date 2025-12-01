@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTerminal } from '../../hooks/useTerminal';
 import { motion, AnimatePresence } from 'framer-motion';
-import clsx from 'clsx';
+import { ProjectDetail } from '../Modals/ProjectDetail';
+import { YuuichiMode } from '../Modals/YuuichiMode';
 
 export const Terminal: React.FC = () => {
   const { outputs, processCommand, history, isBooting } = useTerminal();
@@ -43,6 +44,17 @@ export const Terminal: React.FC = () => {
     inputRef.current?.focus();
   };
 
+  const renderContent = (content: string | React.ReactNode) => {
+    if (typeof content === 'string' && content.startsWith('PROJECT_DETAIL:')) {
+      const id = content.split(':')[1];
+      return <ProjectDetail id={id} />;
+    }
+    if (content === 'YUUICHI_MODE') {
+      return <YuuichiMode />;
+    }
+    return <div className="whitespace-pre-wrap text-neon-blue/90">{content}</div>;
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 font-mono text-sm md:text-base" onClick={focusInput}>
       <motion.div 
@@ -81,7 +93,7 @@ export const Terminal: React.FC = () => {
                 ) : out.type === 'error' ? (
                   <div className="text-red-400">{out.content}</div>
                 ) : (
-                  <div className="whitespace-pre-wrap text-neon-blue/90">{out.content}</div>
+                  renderContent(out.content)
                 )}
               </motion.div>
             ))}
